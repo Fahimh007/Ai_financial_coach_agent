@@ -667,7 +667,7 @@ def main():
         
         # Create sample CSV content
         sample_csv = """Date,Category,Amount
-2024-01-01,Housing,1200.00
+2024-01-01,Housing,1200.00git remote set-url origin https://github.com/Fahimh007/Ai_financial_coach_agent.git
 2024-01-02,Food,150.50
 2024-01-03,Transportation,45.00"""
         
