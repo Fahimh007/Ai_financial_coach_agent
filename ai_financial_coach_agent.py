@@ -5,6 +5,7 @@ import plotly.graph_objects as go
 from typing import Dict, List, Optional, Any
 import os
 import asyncio
+import re
 from datetime import datetime
 from dotenv import load_dotenv
 import json
@@ -95,6 +96,18 @@ def parse_json_safely(data: str, default_value: Any = None) -> Any:
         return json.loads(data) if isinstance(data, str) else data
     except json.JSONDecodeError:
         return default_value
+
+def is_transient_model_error(error: Exception) -> bool:
+    """Detect model-side transient failures that should be retried."""
+    error_text = str(error).lower()
+    return bool(
+        re.search(r"\b503\b", error_text)
+        or "unavailable" in error_text
+        or "high demand" in error_text
+        or "temporarily unavailable" in error_text
+        or "rate limit" in error_text
+        or "quota" in error_text
+    )
 
 class FinanceAdvisorSystem:
     def __init__(self):
@@ -234,13 +247,30 @@ IMPORTANT: Store your final plan in state['debt_reduction'] and ensure it aligns
                 parts=[types.Part(text=json.dumps(financial_data))]
             )
             
-            async for event in self.runner.run_async(
-                user_id=USER_ID,
-                session_id=session_id,
-                new_message=user_content
-            ):
-                if event.is_final_response() and event.author == self.coordinator_agent.name:
+            max_attempts = 3
+            for attempt in range(1, max_attempts + 1):
+                try:
+                    async for event in self.runner.run_async(
+                        user_id=USER_ID,
+                        session_id=session_id,
+                        new_message=user_content
+                    ):
+                        if event.is_final_response() and event.author == self.coordinator_agent.name:
+                            break
                     break
+                except Exception as run_error:
+                    if attempt < max_attempts and is_transient_model_error(run_error):
+                        wait_seconds = 2 ** (attempt - 1)
+                        logger.warning(
+                            "Transient model error on attempt %s/%s; retrying in %s seconds: %s",
+                            attempt,
+                            max_attempts,
+                            wait_seconds,
+                            run_error,
+                        )
+                        await asyncio.sleep(wait_seconds)
+                        continue
+                    raise
             
             updated_session = self.session_service.get_session(
                 app_name=APP_NAME,
@@ -257,6 +287,8 @@ IMPORTANT: Store your final plan in state['debt_reduction'] and ensure it aligns
             
         except Exception as e:
             logger.exception(f"Error during finance analysis: {str(e)}")
+            if is_transient_model_error(e):
+                return self._create_default_results(financial_data)
             raise
         finally:
             self.session_service.delete_session(
@@ -618,11 +650,11 @@ def main():
     
     # Sidebar with API key info and CSV template
     with st.sidebar:
-        st.title("🔑 Setup & Templates")
-        st.info("📝 Please ensure you have your Gemini API key in the .env file:\n```\nGOOGLE_API_KEY=your_api_key_here\n```")
-        st.caption("This application uses Google's ADK (Agent Development Kit) and Gemini AI to provide personalized financial advice.")
+        # st.title("🔑 Setup & Templates")
+        # st.info("📝 Please ensure you have your Gemini API key in the .env file:\n```\nGOOGLE_API_KEY=your_api_key_here\n```")
+        # st.caption("This application uses Google's ADK (Agent Development Kit) and Gemini AI to provide personalized financial advice.")
         
-        st.divider()
+        # st.divider()
         
         # Add CSV template download
         st.subheader("📊 CSV Template")
@@ -956,12 +988,7 @@ def main():
         - All data is processed locally
         - No financial information is stored or transmitted
         - Secure API communication with Google's services
-        
-        ### Need Help?
-        
-        For support or questions:
-        - Check the [documentation](https://github.com/Shubhamsaboo/awesome-llm-apps)
-        - Report issues on [GitHub](https://github.com/Shubhamsaboo/awesome-llm-apps/issues)
+      
         """)
 
 if __name__ == "__main__":

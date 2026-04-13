@@ -6,3 +6,4 @@ numpy==1.26.4
 python-dotenv>=1.0.0
 plotly>=5.15.0
 asyncio>=3.4.3
+Deprecated>=1.2.14
