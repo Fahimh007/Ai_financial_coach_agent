@@ -19,3 +19,4 @@ app = "ai_financial_coach_agent:main"
 [build-system]
 requires = ["setuptools>=61.0", "wheel"]
 build-backend = "setuptools.build_meta"
+ 
