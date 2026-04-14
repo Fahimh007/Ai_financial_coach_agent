@@ -1,0 +1,21 @@
+[project]
+name = "ai_financial_coach_agent"
+version = "0.1.0"
+description = "AI Financial Coach app built with Streamlit and Google Gemini."
+requires-python = ">=3.11"
+dependencies = [
+    "streamlit",
+    "pandas",
+    "plotly",
+    "python-dotenv",
+    "pydantic",
+    "google-adk",
+    "google-genai",
+]
+
+[project.scripts]
+app = "ai_financial_coach_agent:main"
+
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
