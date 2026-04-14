@@ -108,6 +108,4 @@ For Render, use a `Web Service` and configure:
 - Keep `.env` out of source control.
 - ` .venv` should be ignored by `.gitignore`.
 
-## Repository
 
-https://github.com/Fahimh007/Ai_financial_coach_agent
