@@ -98,7 +98,7 @@ For Render, use a `Web Service` and configure:
 - Build command: `pip install -r requirements.txt`
 - Start command:
   ```bash
-  streamlit run ai_financial_coach_agent.py --server.port $PORT --server.address 0.0.0.0 --server.enableCORS false --server.headless true
+  streamlit run ai_financial_coach_agent.py
   ```
 - Set `GOOGLE_API_KEY` as a Render environment variable.
 
