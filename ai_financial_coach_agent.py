@@ -766,7 +766,7 @@ def main():
                         manual_expenses[cat] = st.number_input(
                             emoji_cat,
                             min_value=0.0,
-                            step=50.0,
+                            step=100.0,
                             value=0.0,
                             key=f"manual_{cat}",
                             help=f"Enter your monthly {cat.lower()} expenses"
@@ -850,7 +850,7 @@ def main():
                             "Minimum Payment ($)",
                             min_value=0.0,
                             step=10.0,
-                            value=50.0,
+                            value=100.0,
                             key=f"debt_min_payment_{i}",
                             help="Enter the minimum monthly payment required"
                         )
