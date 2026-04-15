@@ -91,16 +91,6 @@ streamlit run ai_financial_coach_agent.py
 
 Then open the local Streamlit URL shown in the terminal.
 
-## Deployment
-
-For Render, use a `Web Service` and configure:
-
-- Build command: `pip install -r requirements.txt`
-- Start command:
-  ```bash
-  streamlit run ai_financial_coach_agent.py --server.port $PORT --server.address 0.0.0.0 --server.enableCORS false --server.headless true
-  ```
-- Set `GOOGLE_API_KEY` as a Render environment variable.
 
 ## Notes
 
@@ -108,6 +98,4 @@ For Render, use a `Web Service` and configure:
 - Keep `.env` out of source control.
 - ` .venv` should be ignored by `.gitignore`.
 
-## Repository
 
-https://github.com/Fahimh007/Ai_financial_coach_agent
